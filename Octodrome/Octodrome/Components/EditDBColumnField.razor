@@ -1,0 +1,24 @@
+﻿@using BlazorFluentUI
+@using Octodrome.DB
+
+@if (Value.Visible)
+{
+    <BFUTextField
+        Underlined="true"
+        Disabled="@Disabled"
+        ValidateOnFocusOut="true"
+        Label="@Value.Label"
+        Placeholder="@Value.Placeholder"
+        @bind-Value="Value.EditText"
+        @bind-Value:event="onchange"
+        OnGetErrorMessage="@Value.ParseAndValidate"
+    />
+}
+
+@code {
+    [Parameter]
+    public IColumn Value { get; set; }
+    [Parameter]
+    public bool ToBeDeleted { get; set; } = false;
+    public bool Disabled => ToBeDeleted || Value.Disabled;
+}

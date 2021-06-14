@@ -1,7 +1,42 @@
 ﻿@page "/"
+@using BlazorFluentUI
+@using Octodrome.Data
+@using Octodrome.DB
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<EditDBTableRow Value="@row"/>
+
+<!--
+<BFUStack Horizontal="true" Tokens=@(new BFUStackTokens() { ChildrenGap = new[] { 40.0 } })>
+        <BFUDefaultButton Text="Standard" />
+        <BFUPrimaryButton Text="Primary" />
+</BFUStack>
+-->
+
+@code {
+    public Table row = new Table(
+        "A test table",
+        new Column<int>(
+            "Give me a number",
+            "",
+            parse: x => DBUtil.ParseInt(x, 1, 10),
+            placeholder: "any whole number..."
+        ),
+        new Column<string>(
+            "Give me some text",
+            "",
+            parse: x => DBUtil.TrimmedText(x, allowEmpty: false),
+            placeholder: "anything you like..."
+        ),
+        new Column<string>(
+            "This is hidden",
+            "",
+            parse: x => x,
+            visible: false
+        )
+    );
+
+}

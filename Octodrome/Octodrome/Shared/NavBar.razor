@@ -1,0 +1,34 @@
+﻿@using BlazorFluentUI
+
+<BFUStack Style="width:100%;">
+    <BFUNavBar Direction="LayoutDirection.Horizontal" Items="@navBarItems" />
+</BFUStack>
+
+@code {
+    public BFUNavBarItem[] navBarItems = new[] {
+        new BFUNavBarItem {
+            Key = "1",
+            Text = "People",
+            Url = "/People",
+            NavMatchType = NavMatchType.AnchorOnly
+        },
+        new BFUNavBarItem {
+            Key = "2",
+            Text = "Organisations",
+            Url = "/Organisations",
+            NavMatchType = NavMatchType.AnchorOnly
+        },
+        new BFUNavBarItem {
+            Key = "3",
+            Text = "Tasks",
+            Url = "/Tasks",
+            NavMatchType = NavMatchType.AnchorOnly
+        },
+        new BFUNavBarItem {
+            Key = "4",
+            Text = "Documents",
+            Url = "/Documents",
+            NavMatchType = NavMatchType.AnchorOnly
+        },
+    };
+}

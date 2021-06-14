@@ -1,0 +1,23 @@
+﻿@page "/People"
+@using BlazorFluentUI
+@inject NavigationManager NavigationManager
+
+<h3>People</h3>
+
+<BFUPrimaryButton
+    IconName="Add"
+    Text="New person"
+    OnClick="GoToAddPerson"
+    />
+
+<p>
+    [At some point add searching etc. here.]
+</p>
+
+@code {
+
+    public void GoToAddPerson() {
+        NavigationManager.NavigateTo("/NewPerson");
+    }
+
+}

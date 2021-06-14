@@ -1,0 +1,32 @@
+﻿@using BlazorFluentUI
+@using Octodrome.DB
+
+@if (!string.IsNullOrEmpty(Value.Label)) {
+    <h3>@Value.Label</h3>
+}
+
+@if (Value.IsDeletable) {
+    <BFUToggle
+        @bind-Checked="IsToBeDeleted"
+        InlineLabel="true"
+        Label="Delete"
+        />
+}
+
+@foreach (var column in Value.Columns) {
+    <EditDBColumnField Value="@column" ToBeDeleted="@Value.IsToBeDeleted" />
+}
+
+@code {
+    [Parameter]
+    public Table Value { get; set; }
+
+    public bool IsToBeDeleted
+    {
+        get => Value.IsToBeDeleted;
+        set
+        {
+            if (value) Value.Delete(); else Value.Undelete();
+        }
+    }
+}

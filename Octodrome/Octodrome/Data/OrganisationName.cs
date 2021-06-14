@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace Octodrome.Data
 {
-    public class Party
+    public class OrganisationName
     {
         public int ID;
-        public string Kind; // Person or Organisation.
+        public int PartyID;
+        public int Organisation;
     }
 }

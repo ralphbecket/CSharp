@@ -1,0 +1,6 @@
+﻿https://github.com/BlazorFluentUI/BlazorFluentUI
+Install NuGet package BlazorFluentUI.AllComponents .
+
+https://gist.github.com/SteveSandersonMS/175a08dcdccb384a52ba760122cd2eda
+In App.razor wrap the <Router> in <CascadingAuthenticationState>
+

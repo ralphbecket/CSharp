@@ -1,0 +1,44 @@
+﻿@page "/NewPerson"
+@using BlazorFluentUI
+@using Octodrome.Data
+@using Octodrome.DB
+
+<h3>New Person</h3>
+
+<EditDBTableRow Value="@Name" />
+
+<BFUStack>
+
+    @foreach (var contact in Contacts) {
+        <BFUStackItem>
+            <EditDBTableRow Value="@contact" />
+        </BFUStackItem>
+    }
+    <BFUStackItem>
+        <BFUStack Horizontal="true">
+            <BFUCommandBarButton IconName="Add" Text="Phone" @onclick="AddPhoneNumber" />
+            <BFUCommandBarButton IconName="Add" Text="E-mail" @onclick="AddEMailAddress" />
+            <BFUCommandBarButton IconName="Add" Text="Postal" @onclick="AddPostalAddress" />
+            <BFUCommandBarButton IconName="Add" Text="Web" @onclick="AddWebAddress" />
+        </BFUStack>
+    </BFUStackItem>
+
+</BFUStack>
+
+@code {
+    public Party NewParty { get; set; } = new Party { Kind = "Person" };
+    public PersonName Name { get; set; } = new PersonName { IsDeletable = false };
+    public List<ContactDetails> Contacts { get; set; } = new List<ContactDetails> { };
+    public void AddPhoneNumber() {
+        Contacts.Add(new PhoneNumber());
+    }
+    public void AddEMailAddress() {
+        Contacts.Add(new EMailAddress());
+    }
+    public void AddPostalAddress() {
+        Contacts.Add(new PostalAddress());
+    }
+    public void AddWebAddress() {
+        Contacts.Add(new WebAddress());
+    }
+}

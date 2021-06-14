@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Octodrome.Areas.Identity;
 using Octodrome.Data;
+using BlazorFluentUI;
 
 namespace Octodrome
 {
@@ -39,7 +40,8 @@ namespace Octodrome
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            services.AddSingleton<WeatherForecastService>();
+            // services.AddSingleton<WeatherForecastService>();
+            services.AddBlazorFluentUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

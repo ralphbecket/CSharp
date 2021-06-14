@@ -1,0 +1,17 @@
+I want to make this POCO/DB stuff as regular as possible.
+
+Here's my idea.
+
+POCOs will correspond to DB tables.
+Each will have a table-unique ID.
+Each will have some fields.
+Each field will have
+- a type (string, bool, date, datetime, int, float, enum, reference);
+- backing text value;
+- a parser;
+- validation rules;
+- flags (loaded, edited, conflicted, read-only);
+
+Okay, so let's have a Table class and a Column class.
+Tables can have multi-column validators.
+Tables can have multiplicity constraints on referencing tables.

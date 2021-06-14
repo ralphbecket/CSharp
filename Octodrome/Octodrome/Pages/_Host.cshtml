@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using BlazorFluentUI
 @namespace Octodrome.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
@@ -12,11 +13,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Octodrome</title>
     <base href="~/" />
+    <!--
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    -->
     <link href="css/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
 </head>
 <body>
-    <app>
+    <app
+        style="width: 100vw; height: 100vh;"
+    >
+        <component type="typeof(BFUGlobalRules)" render-mode="ServerPrerendered" />
         <component type="typeof(App)" render-mode="ServerPrerendered" />
     </app>
 
@@ -31,6 +38,7 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <script src="_content/BlazorFluentUI.BFUBaseComponent/blazorFluentUi.min.js"></script>
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>
