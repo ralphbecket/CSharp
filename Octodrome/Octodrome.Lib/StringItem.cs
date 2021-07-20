@@ -20,12 +20,34 @@ namespace Octodrome.Lib
             doc = doc.Apply(edit);
             return doc;
         }
+        public static Doc Create(Doc doc, out Guid stringID, string value = "")
+        {
+            doc = doc.NewID(out var editID);
+            doc = doc.NewID(out stringID);
+            return Create(doc, editID, stringID, value);
+        }
         public static Doc Change(Doc doc, Guid editID, StringItem before, string value)
         {
             var id = before.ID;
             var after = new StringItem(id, value);
             var edit = new ChangeStringEdit(editID, before, after);
             doc = doc.Apply(edit);
+            return doc;
+        }
+        public static Doc Change(Doc doc, StringItem before, string value)
+        {
+            doc = doc.NewID(out var editID);
+            return Change(doc, editID, before, value);
+        }
+        public Doc DeepClone(Doc doc, out IItem clone, Dictionary<Guid, IItem>? clones = null)
+        {
+            if (clones != null && clones.ContainsKey(ID))
+            {
+                clone = clones[ID];
+                return doc;
+            }
+            doc = Create(doc, out var cloneID, value: Value);
+            clone = doc[cloneID];
             return doc;
         }
 

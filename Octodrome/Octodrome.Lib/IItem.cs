@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Octodrome.Lib
 {
@@ -8,5 +9,6 @@ namespace Octodrome.Lib
     public interface IItem
     {
         public Guid ID { get; }
+        public Doc DeepClone(Doc doc, out IItem clone, Dictionary<Guid, IItem>? clones = null);
     }
 }

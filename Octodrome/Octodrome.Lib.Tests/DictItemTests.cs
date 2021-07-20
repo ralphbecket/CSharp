@@ -17,9 +17,7 @@ namespace Octodrome.Lib.Tests
             var doc = Doc.New();
             Assert.IsFalse(doc.CanRedo);
             Assert.IsFalse(doc.CanUndo);
-            var dictID = NewID();
-            var createID = NewID();
-            doc = DictItem.Create(doc, createID, dictID);
+            doc = DictItem.Create(doc, out var dictID);
             var dict = doc.Item<DictItem>(dictID);
         }
 
@@ -27,26 +25,18 @@ namespace Octodrome.Lib.Tests
         public void SetTest()
         {
             var doc = Doc.New();
-            var dictID = NewID();
-            var createID = NewID();
-            doc = DictItem.Create(doc, createID, dictID);
-            Assert.IsTrue(doc.HasItem(dictID));
-            Assert.IsInstanceOfType(doc[dictID], typeof(DictItem));
-            var stringID = NewID();
-            createID = NewID();
-            doc = StringItem.Create(doc, createID, stringID, "abc");
+            doc = DictItem.Create(doc, out var dictID);
             var dict = doc.Item<DictItem>(dictID);
-            var setID = NewID();
-            doc = DictItem.Set(doc, setID, dict, "Foo", stringID);
+            doc = StringItem.Create(doc, out var stringID, "abc");
+            doc = DictItem.Set(doc, dict, "Foo", stringID);
             var stringItem = doc.DictItem<StringItem>(dictID, "Foo");
             Assert.AreEqual("abc", stringItem.Value);
             // Now change the string value and verify.
-            doc = StringItem.Change(doc, NewID(), stringItem, "xyz");
+            doc = StringItem.Change(doc, stringItem, "xyz");
             stringItem = doc.DictItem<StringItem>(dictID, "Foo");
             Assert.AreEqual("xyz", stringItem.Value);
             // Now change the field entry and verify.
-            var newStringID = NewID();
-            doc = StringItem.Create(doc, NewID(), newStringID, "pqr");
+            doc = StringItem.Create(doc, out var newStringID, "pqr");
             dict = doc.Item<DictItem>(dictID);
             doc = DictItem.Set(doc, NewID(), dict, "Foo", newStringID);
             var newStringItem = doc.DictItem<StringItem>(dictID, "Foo");
@@ -57,22 +47,15 @@ namespace Octodrome.Lib.Tests
         public void RemoveTest()
         {
             var doc = Doc.New();
-            var dictID = NewID();
-            var createID = NewID();
-            doc = DictItem.Create(doc, createID, dictID);
-            Assert.IsTrue(doc.HasItem(dictID));
-            Assert.IsInstanceOfType(doc[dictID], typeof(DictItem));
-            var stringID = NewID();
-            createID = NewID();
-            doc = StringItem.Create(doc, createID, stringID, "abc");
+            doc = DictItem.Create(doc, out var dictID);
             var dict = doc.Item<DictItem>(dictID);
-            var setID = NewID();
-            doc = DictItem.Set(doc, setID, dict, "Foo", stringID);
+            doc = StringItem.Create(doc, out var stringID, "abc");
             dict = doc.Item<DictItem>(dictID);
-            var removeID = NewID();
-            doc = DictItem.Remove(doc, removeID, dict, "Foo");
+            doc = DictItem.Set(doc, dict, "Foo", stringID);
             dict = doc.Item<DictItem>(dictID);
-            Assert.IsTrue(!dict.ContainsKey("Foo"));
+            doc = DictItem.Remove(doc, "Foo", dict);
+            dict = doc.Item<DictItem>(dictID);
+            Assert.IsFalse(dict.ContainsKey("Foo"));
         }
 
         [TestMethod()]
@@ -81,13 +64,10 @@ namespace Octodrome.Lib.Tests
             var doc = Doc.New();
             Assert.IsFalse(doc.CanRedo);
             Assert.IsFalse(doc.CanUndo);
-            var dictID = NewID();
-            var createID = NewID();
-            doc = DictItem.Create(doc, createID, dictID);
+            doc = DictItem.Create(doc, out var dictID);
             Assert.IsFalse(doc.CanRedo);
             Assert.IsTrue(doc.CanUndo);
-            Assert.IsTrue(doc.HasItem(dictID));
-            Assert.IsInstanceOfType(doc[dictID], typeof(DictItem));
+            var dict = doc.Item<DictItem>(dictID);
             doc = doc.Undo();
             Assert.IsTrue(doc.CanRedo);
             Assert.IsFalse(doc.CanUndo);
@@ -95,12 +75,9 @@ namespace Octodrome.Lib.Tests
             doc = doc.Redo();
             Assert.IsFalse(doc.CanRedo);
             Assert.IsTrue(doc.CanUndo);
-            Assert.IsTrue(doc.HasItem(dictID));
-            Assert.IsInstanceOfType(doc[dictID], typeof(DictItem));
-            var stringID = NewID();
-            doc = StringItem.Create(doc, NewID(), stringID, "abc");
-            var dict = doc.Item<DictItem>(dictID);
-            doc = DictItem.Set(doc, NewID(), dict, "Foo", stringID);
+            dict = doc.Item<DictItem>(dictID);
+            doc = StringItem.Create(doc, out var stringID, "abc");
+            doc = DictItem.Set(doc, dict, "Foo", stringID);
             var stringItem = doc.DictItem<StringItem>(dictID, "Foo");
             Assert.AreEqual("abc", stringItem.Value);
             Assert.IsFalse(doc.CanRedo);

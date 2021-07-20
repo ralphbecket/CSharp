@@ -14,9 +14,7 @@ namespace Octodrome.Lib.Tests
             var doc = Doc.New();
             Assert.IsFalse(doc.CanRedo);
             Assert.IsFalse(doc.CanUndo);
-            var stringID = NewID();
-            var createID = NewID();
-            doc = StringItem.Create(doc, createID, stringID, "abc");
+            doc = StringItem.Create(doc, out var stringID, "abc");
             var stringItem = doc.Item<StringItem>(stringID);
             Assert.AreEqual("abc", stringItem.Value);
         }
@@ -25,11 +23,8 @@ namespace Octodrome.Lib.Tests
         public void ChangeTest()
         {
             var doc = Doc.New();
-            var stringID = NewID();
-            var createID = NewID();
-            doc = StringItem.Create(doc, createID, stringID, "abc");
-            var changeID = NewID();
-            doc = StringItem.Change(doc, changeID, (StringItem)doc[stringID], "xyz");
+            doc = StringItem.Create(doc, out var stringID, "abc");
+            doc = StringItem.Change(doc, doc.Item<StringItem>(stringID), "xyz");
             var stringItem = doc.Item<StringItem>(stringID);
             Assert.AreEqual("xyz", stringItem.Value);
         }
@@ -38,11 +33,8 @@ namespace Octodrome.Lib.Tests
         public void UndoRedoTest()
         {
             var doc = Doc.New();
-            var stringID = NewID();
-            var createID = NewID();
-            doc = StringItem.Create(doc, createID, stringID, "abc");
-            var changeID = NewID();
-            doc = StringItem.Change(doc, changeID, (StringItem)doc[stringID], "xyz");
+            doc = StringItem.Create(doc, out var stringID, "abc");
+            doc = StringItem.Change(doc, doc.Item<StringItem>(stringID), "xyz");
             doc = doc.Undo();
             var stringItem = doc.Item<StringItem>(stringID);
             Assert.AreEqual("abc", stringItem.Value);

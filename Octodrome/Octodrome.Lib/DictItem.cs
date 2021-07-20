@@ -22,6 +22,12 @@ namespace Octodrome.Lib
             doc = doc.Apply(edit);
             return doc;
         }
+        public static Doc Create(Doc doc, out Guid dictID)
+        {
+            doc = doc.NewID(out var editID);
+            doc = doc.NewID(out dictID);
+            return Create(doc, editID, dictID);
+        }
         public static Doc Set(Doc doc, Guid editID, DictItem before, string key, Guid valueID)
         {
             var id = before.ID;
@@ -29,11 +35,41 @@ namespace Octodrome.Lib
             doc = doc.Apply(edit);
             return doc;
         }
-        public static Doc Remove(Doc doc, Guid editID, DictItem before, string key)
+        public static Doc Set(Doc doc, DictItem before, string key, Guid valueID)
+        {
+            doc = doc.NewID(out var editID);
+            return Set(doc, editID, before, key, valueID);
+        }
+        public static Doc Remove(Doc doc, Guid editID, string key, DictItem before)
         {
             var id = before.ID;
             var edit = new RemoveDictFieldEdit(editID, before, key);
             doc = doc.Apply(edit);
+            return doc;
+        }
+        public static Doc Remove(Doc doc, string key, DictItem before)
+        {
+            doc = doc.NewID(out var editID);
+            return Remove(doc, editID, key, before);
+        }
+        public Doc DeepClone(Doc doc, out IItem clone, Dictionary<Guid, IItem>? clones = null)
+        {
+            clones = clones ?? new Dictionary<Guid, IItem> { };
+            if (clones.ContainsKey(ID))
+            {
+                clone = clones[ID];
+                return doc;
+            }
+            doc = Create(doc, out var dictID);
+            var dictClone = (DictItem)doc[dictID];
+            clone = dictClone;
+            foreach (var key in Value.Keys)
+            {
+                var valueID = Value[key];
+                var value = doc[valueID];
+                doc = value.DeepClone(doc, out var valueClone, clones);
+                doc = DictItem.Set(doc, dictClone, key, valueClone.ID);
+            }
             return doc;
         }
 
