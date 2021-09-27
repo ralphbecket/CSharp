@@ -1,0 +1,15 @@
+DictItems need templates.
+- Add new item option needs to
+  - take a new key,
+    - keys may have "OneOf" constraints (do next).
+  - verify that the key is unique,
+  - clone the template,
+  - add the new item to the dictionary.
+  ! Templates should be copied, not cloned, when cloning the DictItem.
+- Remove item already exists.
+- UI needs to be extended with add/remove options.
+
+"OneOf" constraints.
+- A OneOf constraint indicates that a key or value should be drawn
+  from the set of keys in a given DictItem (autocomplete etc.).
+- 

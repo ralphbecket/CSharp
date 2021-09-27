@@ -18,6 +18,13 @@ namespace Octodrome.Lib
         internal readonly static ImmutableStack<IEdit> EmptyEditStack =
             ImmutableStack<IEdit>.Empty;
 
+        public Doc(IGuidSupply? guidSupply = null)
+        {
+            Items = EmptyItemDict;
+            Edits = EmptyEditStack;
+            Redos = EmptyEditStack;
+            GuidSupply = guidSupply ?? new GuidSupply();
+        }
         public static Doc New(IGuidSupply? guidSupply = null)
         {
             return new Doc
@@ -25,7 +32,7 @@ namespace Octodrome.Lib
                 Items = EmptyItemDict,
                 Edits = EmptyEditStack,
                 Redos = EmptyEditStack,
-                GuidSupply = guidSupply ?? new GuidSupply(),
+                GuidSupply = guidSupply ?? new GuidSupply()
             };
         }
         public bool HasItem(Guid itemID) => Items.ContainsKey(itemID);

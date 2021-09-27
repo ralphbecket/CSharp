@@ -1,0 +1,45 @@
+﻿<div class="DictItemView">
+    @foreach (var kv in Item.Value)
+    {
+        @if (DisplayVertically(kv.Value))
+        {
+            <div class="DictItemKeyValueV">
+                <div class="DictItemKeyV">
+                    @kv.Key
+                </div>
+                <div class="DictItemValueV">
+                    <ItemView ViewState="@ViewState" Item="@ViewState.Doc[kv.Value]"/>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="DictItemKeyValueH">
+                <div class="DictItemKeyH">
+                    @kv.Key
+                </div>
+                <div class="DictItemValueH">
+                    <ItemView ViewState="@ViewState" Item="@ViewState.Doc[kv.Value]"/>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ViewState ViewState { get; set; }
+    [Parameter]
+    public FormItem Item { get; set; }
+
+    private bool DisplayVertically(Guid id) {
+        var item = ViewState.Doc[id];
+        var displayVertically = (
+            item is DictItem ||
+            item is FormItem ||
+            // Other options here...
+            false
+        );
+        return displayVertically;
+    }
+}

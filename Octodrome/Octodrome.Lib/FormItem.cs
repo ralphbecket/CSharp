@@ -1,55 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 
 namespace Octodrome.Lib
 {
-    public class DictItem: IItem
+    public class FormItem: IItem
     {
         public Guid ID { get; internal set; } = Guid.NewGuid();
-        public ImmutableDictionary<string, Guid> Value { get; internal set; }
-        public DictItem? ValueTemplate { get; internal set; }
-        public Guid this[string key] => Value[key];
-        public bool ContainsKey(string key) => Value.ContainsKey(key);
-        public DictItem(Guid dictID, ImmutableDictionary<string, Guid>? value = null, DictItem? valueTemplate = null)
+        public ImmutableList<KeyValuePair<string, Guid>> Value { get; internal set; }
+        public Guid this[string key] => Value.First(kv => kv.Key == key).Value;
+        public bool ContainsKey(string key) => Value.Any(kv => kv.Key == key);
+        public FormItem(Guid FormID, ImmutableList<KeyValuePair<string, Guid>>? value = null)
         {
-            ID = dictID;
-            Value = value ?? ImmutableDictionary<string, Guid>.Empty;
-            ValueTemplate = valueTemplate;
+            ID = FormID;
+            Value = value ?? ImmutableList<KeyValuePair<string, Guid>>.Empty;
         }
-        public static Doc Create(Doc doc, Guid editID, Guid dictID)
+        public FormItem(Guid FormID, IEnumerable<KeyValuePair<string, Guid>> value)
         {
-            var edit = new CreateDictEdit(editID, dictID);
+            ID = FormID;
+            Value = ImmutableList<KeyValuePair<string, Guid>>.Empty.AddRange(value);
+        }
+        public static Doc Create(Doc doc, Guid editID, Guid FormID)
+        {
+            var edit = new CreateFormEdit(editID, FormID);
             doc = doc.Apply(edit);
             return doc;
         }
-        public static Doc Create(Doc doc, out Guid dictID)
+        public static Doc Create(Doc doc, out Guid FormID)
         {
             doc = doc.NewID(out var editID);
-            doc = doc.NewID(out dictID);
-            return Create(doc, editID, dictID);
+            doc = doc.NewID(out FormID);
+            return Create(doc, editID, FormID);
         }
-        public static Doc Set(Doc doc, Guid editID, DictItem before, string key, Guid valueID)
+        public static Doc Set(Doc doc, Guid editID, FormItem before, string key, Guid valueID)
         {
             var id = before.ID;
-            var edit = new SetDictFieldEdit(editID, before, key, valueID);
+            var edit = new SetFormFieldEdit(editID, before, key, valueID);
             doc = doc.Apply(edit);
             return doc;
         }
-        public static Doc Set(Doc doc, DictItem before, string key, Guid valueID)
+        public static Doc Set(Doc doc, FormItem before, string key, Guid valueID)
         {
             doc = doc.NewID(out var editID);
             return Set(doc, editID, before, key, valueID);
         }
-        public static Doc Remove(Doc doc, Guid editID, string key, DictItem before)
+        public static Doc Remove(Doc doc, Guid editID, string key, FormItem before)
         {
             var id = before.ID;
-            var edit = new RemoveDictFieldEdit(editID, before, key);
+            var edit = new RemoveFormFieldEdit(editID, before, key);
             doc = doc.Apply(edit);
             return doc;
         }
-        public static Doc Remove(Doc doc, string key, DictItem before)
+        public static Doc Remove(Doc doc, string key, FormItem before)
         {
             doc = doc.NewID(out var editID);
             return Remove(doc, editID, key, before);
@@ -62,32 +66,33 @@ namespace Octodrome.Lib
                 clone = clones[ID];
                 return doc;
             }
-            doc = Create(doc, out var dictID);
-            var dictClone = (DictItem)doc[dictID];
-            clone = dictClone;
-            foreach (var key in Value.Keys)
+            doc = Create(doc, out var FormID);
+            var FormClone = (FormItem)doc[FormID];
+            clone = FormClone;
+            foreach (var kv in Value)
             {
-                var valueID = Value[key];
-                var value = doc[valueID];
+                var key = kv.Key;
+                var valueID = kv.Value;
+                var value = doc[kv.Value];
                 doc = value.DeepClone(doc, out var valueClone, clones);
-                doc = DictItem.Set(doc, dictClone, key, valueClone.ID);
+                doc = FormItem.Set(doc, FormClone, key, valueClone.ID);
             }
             return doc;
         }
 
-        public class CreateDictEdit: IEdit
+        public class CreateFormEdit: IEdit
         {
             public Guid ID { get; internal set; }
-            internal DictItem NewDictItem;
-            public CreateDictEdit(Guid editID, Guid dictID)
+            internal FormItem NewFormItem;
+            public CreateFormEdit(Guid editID, Guid FormID)
             {
                 ID = editID;
-                NewDictItem = new DictItem(dictID);
+                NewFormItem = new FormItem(FormID);
             }
-            public Guid ItemID => NewDictItem.ID;
+            public Guid ItemID => NewFormItem.ID;
             public ImmutableDictionary<Guid, IItem> Apply(ImmutableDictionary<Guid, IItem> items)
             {
-                items = items.SetItem(ItemID, NewDictItem);
+                items = items.SetItem(ItemID, NewFormItem);
                 return items;
             }
             public ImmutableDictionary<Guid, IItem> Revert(ImmutableDictionary<Guid, IItem> items)
@@ -97,22 +102,27 @@ namespace Octodrome.Lib
             }
         }
 
-        public class SetDictFieldEdit: IEdit
+        public class SetFormFieldEdit: IEdit
         {
             public Guid ID { get; internal set; }
             internal string Key;
             internal Guid ValueID;
-            internal DictItem Before;
-            internal DictItem After;
+            internal FormItem Before;
+            internal FormItem After;
             public Guid ItemID => Before.ID;
-            internal SetDictFieldEdit(Guid editID, DictItem before, string key, Guid valueID)
+            internal SetFormFieldEdit(Guid editID, FormItem before, string key, Guid valueID)
             {
                 ID = editID;
                 Key = key;
                 ValueID = valueID;
                 Before = before;
-                var dict = before.Value.SetItem(key, valueID);
-                After = new DictItem(ItemID, dict);
+                var kvs = Before.Value;
+                var newKV = new KeyValuePair<string, Guid>(key, valueID);
+                After =
+                    ( Before.ContainsKey(key)
+                    ? new FormItem(ItemID, kvs.Select(kv => (kv.Key == key ? newKV : kv)))
+                    : new FormItem(ItemID, kvs.Add(newKV))
+                    );
             }
             public ImmutableDictionary<Guid, IItem> Apply(ImmutableDictionary<Guid, IItem> items)
             {
@@ -126,20 +136,24 @@ namespace Octodrome.Lib
             }
         }
 
-        public class RemoveDictFieldEdit: IEdit
+        public class RemoveFormFieldEdit: IEdit
         {
             public Guid ID { get; internal set; }
             internal string Key;
-            internal DictItem Before;
-            internal DictItem After;
+            internal FormItem Before;
+            internal FormItem After;
             public Guid ItemID => Before.ID;
-            internal RemoveDictFieldEdit(Guid editID, DictItem before, string key)
+            internal RemoveFormFieldEdit(Guid editID, FormItem before, string key)
             {
                 ID = editID;
                 Key = key;
                 Before = before;
-                var dict = before.Value.Remove(key);
-                After = new DictItem(ItemID, dict);
+                var kvs = Before.Value;
+                After =
+                    ( Before.ContainsKey(key)
+                    ? new FormItem(ItemID, kvs.Where(x => x.Key != key))
+                    : Before
+                    );
             }
             public ImmutableDictionary<Guid, IItem> Apply(ImmutableDictionary<Guid, IItem> items)
             {

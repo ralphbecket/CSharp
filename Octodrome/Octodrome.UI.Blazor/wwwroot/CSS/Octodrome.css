@@ -1,0 +1,61 @@
+﻿* { 
+    font-family: sans-serif; 
+    box-sizing: border-box;
+}
+
+.DictItemView {
+    width: 100%;
+    border: 1px solid #ddd;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.DictItemKeyValueH {
+    display: flex;
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.DictItemKeyH {
+    width: 10rem;
+    padding-left: 1rem;
+    font-weight: bold;
+}
+
+.DictItemValueH {
+    flex-grow: 1;
+}
+
+.DictItemKeyValueV {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.DictItemKeyV {
+    width: 100%;
+    padding-left: 1rem;
+    font-weight: bold;
+}
+
+.DictItemValueV {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+}
+
+span.Icon {
+    color: grey;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+input {
+    width: 100%;
+}
+
+.full-width {
+    width: 100%;
+}

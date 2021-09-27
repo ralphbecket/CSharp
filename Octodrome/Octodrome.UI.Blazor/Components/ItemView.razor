@@ -1,0 +1,23 @@
+﻿@if (Item is DictItem)
+{
+    <DictItemView ViewState="@ViewState" Item="@((DictItem)Item)"/>
+}
+else if (Item is FormItem)
+{
+    <FormItemView ViewState="@ViewState" Item="@((FormItem)Item)"/>
+}
+else if (Item is StringItem)
+{
+    <StringItemView ViewState="@ViewState" Item="@((StringItem)Item)"/>
+}
+else
+{
+    <bold style="color: red; font-weight: bold;">What kind of item is @(Item.GetType().Name) ?</bold>
+}
+
+@code {
+    [Parameter]
+    public ViewState ViewState { get; set; }
+    [Parameter]
+    public IItem Item { get; set; }
+}

@@ -1,0 +1,49 @@
+﻿@page "/"
+@page "/HelloWorld"
+
+@code {
+    ViewState ViewState { get; set; }
+
+    IItem Item { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var doc = Doc.New();
+
+        doc = FormItem.Create(doc, out var dictID);
+        var form = (FormItem)doc[dictID];
+        doc = StringItem.Create(doc, out var stringID1, "Foo");
+        doc = FormItem.Set(doc, form, "Field 1", stringID1);
+        form = (FormItem)doc[dictID];
+        doc = StringItem.Create(doc, out var stringID2, "Bar");
+        doc = FormItem.Set(doc, form, "Field 2", stringID2);
+        form = (FormItem)doc[dictID];
+        doc = StringItem.Create(doc, out var stringID3, "Baz");
+        doc = FormItem.Set(doc, form, "Field 3", stringID3);
+        form = (FormItem)doc[dictID];
+        doc = DictItem.Create(doc, out var subDictID);
+        var subDict = (DictItem)doc[subDictID];
+        doc = StringItem.Create(doc, out var stringID4, "Fizz");
+        doc = DictItem.Set(doc, subDict, "Job 1", stringID4);
+        subDict = (DictItem)doc[subDictID];
+        doc = StringItem.Create(doc, out var stringID5, "Buzz");
+        doc = DictItem.Set(doc, subDict, "Job 2", stringID5);
+        subDict = (DictItem)doc[subDictID];
+        doc = StringItem.Create(doc, out var stringID6, "FizzBuzz");
+        doc = DictItem.Set(doc, subDict, "Job 3", stringID6);
+        subDict = (DictItem)doc[subDictID];
+        doc = FormItem.Set(doc, form, "Field 4", subDictID);
+        form = (FormItem)doc[dictID];
+
+        // Get the show on the road.
+        ViewState = new ViewState
+        {
+            Doc = doc
+        };
+        Item = form;
+    }
+}
+
+<h1>Octodrome</h1>
+
+<ItemView ViewState="@ViewState" Item="@Item"/>

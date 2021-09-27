@@ -1,0 +1,80 @@
+﻿<div class="DictItemKeyView">
+    @if (ValidationError != null)
+    {
+        <div class="ValidationError">@ValidationError</div>
+    }
+    @if (InEditMode)
+    {
+        <input type="text" @bind-value="Key" @bind-value:event="oninput" @onkeydown="OnKeyDown" />
+    }
+    else
+    {
+        <span class="Icon" @onclick="StartEditing">[E]</span>
+        @Key
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ViewState ViewState { get; set; }
+    [Parameter]
+    public Guid DictID { get; set; }
+    [Parameter]
+    public string Key { get; set; }
+    [Parameter]
+    public Guid ValueID { get; set; }
+    [Parameter]
+    public bool InEditMode { get; set; } = false;
+    private string PreEditKey;
+    private string ValidationError;
+    private void StartEditing() {
+        PreEditKey = Key;
+        InEditMode = true;
+        ValidationError = null;
+    }
+    private void CancelEditing() {
+        Key = PreEditKey;
+        InEditMode = false;
+        ValidationError = null;
+    }
+    private void OnKeyDown(KeyboardEventArgs e) {
+        if (e.Key == "Escape")
+        {
+            Key = PreEditKey;
+            InEditMode = false;
+            ValidationError = null;
+            return;
+        }
+        if (e.Key != "Enter")
+        {
+            return;
+        }
+        var doc = ViewState.Doc;
+        var dict = (DictItem)doc[DictID];
+        if (Key == "")
+        {
+            ValidationError = "This cannot be empty.";
+            return;
+        }
+        if (Key == PreEditKey)
+        {
+            InEditMode = false;
+            ValidationError = null;
+            return;
+        }
+        if (dict.ContainsKey(Key))
+        {
+            ValidationError = "This is a duplicate of an existing entry.";
+            return;
+        }
+        if (PreEditKey != null && dict.ContainsKey(PreEditKey))
+        {
+            doc = DictItem.Remove(doc, PreEditKey, dict);
+            dict = (DictItem)doc[DictID];
+        }
+        doc = DictItem.Set(doc, dict, Key, ValueID);
+        ViewState.Doc = doc;
+        InEditMode = false;
+        ValidationError = null;
+    }
+}
